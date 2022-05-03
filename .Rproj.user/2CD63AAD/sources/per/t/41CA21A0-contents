@@ -1,0 +1,163 @@
+---
+title: "Reviewing STAT 201 and BAS 320"
+author: "Peyton B Wells"
+date: "February 9, 2022"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**GRADING KEY:**
+
++----------+----------------------------------+
+| Grade    | Reason                           |
++==========+==================================+
+| 5        | *Correct Answer*                 |
++----------+----------------------------------+
+| 4        | *Small errors*                   |
++----------+----------------------------------+
+| 3        | *Moderate errors*                |
++----------+----------------------------------+
+| 1        | *Large errors but valid attempt* |
++----------+----------------------------------+
+| 0        | *Blank or invalid attempt*       |
++----------+----------------------------------+
+
+## Reviewing STAT 201
+
+Using R makes statistics a lot easier. We can perform many of the basic functions we did in STAT 201 quickly with base R functions.
+
+**Beginner R:** *For the start you'll be using the TIPS dataframe here for practice. This can be found in regclass. To get full points make sure to use and show your code. (5 points each)*
+
+```{r BeginnerR}
+library(regclass)
+data(TIPS)
+#1a
+TIPS$Bill[80]
+#1b
+which.max(TIPS$Bill)
+#1c
+percent <- sum(TIPS$TipPercentage>15)
+percent/244
+
+fridaypercent <- TIPS$Weekday=="Friday"
+aggregate(Weekday=="Friday"~TipPercentage<10,data= TIPS, FUN= mean)
+
+```
+1a - What is the bill amount for the 80th person? **17.29
+
+1b - Which row has the largest bill in this dataframe? **171
+
+1c - What percent of people tipped over 15% **0.545082 = 54%
+
+1d - What percent of people on Friday tipped under 10% **8.7%
+
+**Basic Statistics:** *For this portion you'll just run basic statistics. SURVEY10 can be found in the regclass package. (5 points each)*
+
+```{r BasicStatistics}
+data("SURVEY10")
+#2a
+mean(SURVEY10$GPA)
+#2b
+sd(SURVEY10$GPA)
+#2c
+quantile(SURVEY10$GPA, .80)
+#2d
+length(SURVEY10)
+```
+
+2a - Find the mean of GPA for SURVEY10.
+
+2b - Find the standard deviation of GPA.
+
+2c - Find the 80th percentile of GPA.
+
+2d - How many individuals are there in the SURVEY10 dataframe?
+
+**Intermediate Statistics:** *Let's run some tests and create confidence intervals! A major component here will be interpreting your results. You want your results to be understood by people who haven't taken statistics courses. (5 points each)*
+
+```{r IntermediateStatistic}
+#3a
+t.test(SURVEY10$GPA ==3, alternative = "greater")
+#3b
+SCALER <- scale(SURVEY10$Weight)
+head(SCALER)
+#3c
+RIGHT <- subset(SURVEY10,Handedness == "Right")
+LEFT <- subset(SURVEY10,Handedness == "Left")
+
+RW <- RIGHT$Weight
+LW <- LEFT$Weight
+t.test(LW,RW)
+155.6642-149.7377
+#3d
+data("SURVEY09")
+associate(X08.UTFirstChoice~X06.BornInTN, data = SURVEY09)
+```
+
+3a - Run a t-test to see if students have an average GPA greater than 3? Interpret the results below to someone who has not had a statistics course. Your interpretations should help someone without a strong statistics background understand the meaning of your findings.
+
+***The findings show z-scores we have created for the values, this tells us how many standard deviations from the Mean each person is. 
+
+3b - Scale the Weight vector in the data frame and report only the first six observations. Interpret the 5th individual and what their scaled value means in context.
+
+*** The 5th individual has a z-score of -0.4268950, this means that we can say, "The person represented in the 5th position has a weight that is .427 standard deviations lower than the mean.
+
+3c - Compare the values of Weights for right and left handed people (Handedness variable). Clearly interpret the results.
+
+*** After completing a t.test to compare weights for Left handed people and Right handed people, we can say that although our computed means show that right handed people weigh ~6lbs more on average, we cannot say that this has statistical significance, partially because the data is skewed, in that only 61 of our 699 complete cases were left handed. Since we have so many more right handed individuals than left handed in the data, the mean for weight will be higher.
+
+3d - Run the association function on two categoricals of your choosing from any dataframe outside of the SURVEY10 dataframe (Load another dataframe) and compare two categorical variable. Explain the results to someone who doesn't understand statistics.
+
+**Beginner Regression:** *The basics of regression require us to make linear models. This is VERY important to creating time series models. (5 points each)*
+
+```{r BeginnerRegression}
+#4a
+linearmodel <- lm(Weight~DesiredWeight, SURVEY10)
+summary(linearmodel)
+#4b
+visualize_model(linearmodel)
+#4c
+predict(linearmodel)
+residuals(linearmodel)
+```
+
+4a - Create a linear model from SURVEY10 predicting someones Weight from their DesiredWeight. Run summary on the results and interpret the R\^2.
+
+***Given the r^2 is 0.7589 and we know the value will be between 0-1 and will tell us how well the proportion of variation is accounted for in the model, we can say that the data fits the model fairly well. 
+
+4b - Using your linear model, create a visualization of the model (*HINT - This can be done very quickly)*
+
+4c - Make a prediction for an individual that is an extrapolation of the model. You may need to check the data itself or the visualization to find out where extrapolation begins (*Hint - It can technically be on either side)*
+
+4d - Check your model to see if there are any points that have undo influence (*Hint*) on your model. How many points are there?
+
+**Intermediate Regression:** *Regression has abilities well beyond the basics! Time to make more advanced models. (5 points each)*
+
+```{r IntermediateRegression}
+#5a
+LM2 <- lm(Height~Weight+GPA+DesiredWeight, data = SURVEY10)
+#5b
+visualize_model(LM2)
+#5c
+VIF(LM2)
+#5d
+PREDICT <- predict(LM2, interval = "prediction")
+PREDICT[10,]
+```
+
+*5a - Create a model predicting a quantitative Y variable from the interaction of a categorical X and a quantitative X in the SURVEY10 dataframe. Show the summary of this model.*
+
+5b - Create a visualization of the model (*HINT - This can be done very quickly)*
+
+5c - Analyze the variance inflation between your x variables. Interpret the value to the reader in a way they would understand the topic.
+
+***
+
+5d - Make prediction intervals for an individual in the model. You'll call just one individuals prediction interval and interpret what this means.
+
+*** I am 99% confident that this individual would have a height between the interval xx foot and xx foot

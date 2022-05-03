@@ -1,0 +1,26 @@
+library(fpp3)
+
+aus_retail %>% 
+  filter(Industry == "Clothing retailing") %>% 
+  filter(State  == "Australian Capital Territory") ->RANDOMSERIES
+RANDOMSERIES <- RANDOMSERIES[1:421,]
+
+RANDOMSERIES %>% autoplot()
+
+RANDOMSERIES %>%
+  model(
+    classical_decomposition(Turnover, type = "multiplicative")) %>% 
+      components() %>% 
+      forecast() %>%
+      autoplot()+
+      labs(title = "classical additive decomposition of total US retail employment")
+  
+lambda <- RANDOMSERIES %>% 
+  features(Turnover, features=guerrero) %>% 
+             pull(lambda_guerrero)
+RANDOMSERIES %>% 
+  autoplot(box_cox(Turnover, lambda))
+RANDOMSERIESTransfoormed <-box_cox(RANDOMSERIES$Turnover, lambda)
+
+RANDOMSERIES %>% 
+  mutate(Transformed = box_cox(Turnover, lambda)) -> RANDOMSERIES

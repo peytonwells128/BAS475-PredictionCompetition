@@ -32,7 +32,7 @@ holdout <- credit [481:492,]
 cluster <- makeCluster(detectCores() - 1) #Line 1 for parallelization
 registerDoParallel(cluster) #Line 2 for parallelization
 
-train %>% stretch_tsibble(.init = 48, .step = 24) %>%
+credit %>% stretch_tsibble(.init = 48, .step = 24) %>%
   model(NNET = NNETAR(ï..credit_in_millions),
         arima210 = ARIMA(ï..credit_in_millions ~ pdq(2,1,0)),
         arima013 = ARIMA(ï..credit_in_millions ~ pdq(0,1,3)),

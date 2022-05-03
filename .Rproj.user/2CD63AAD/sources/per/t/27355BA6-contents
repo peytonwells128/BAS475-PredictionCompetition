@@ -1,0 +1,88 @@
+library(fpp3)
+
+
+aus_retail %>% 
+  filter(Industry == "Clothing retailing") %>% 
+  filter(State  == "Australian Capital Territory") ->RANDOMSERIES
+RANDOMSERIES <- RANDOMSERIES[1:421,]
+
+#Next 12 Month predictions
+
+RANDOMSERIES %>% autoplot()
+
+RANDOMSERIES %>%
+  model(
+    STL(Turnover ~ trend(window = 7) +
+          season(window = "periodic"),
+        robust = TRUE)) %>%
+  components() %>%
+  autoplot()
+
+
+RANDOMSERIES %>%
+  model(
+    classical_decomposition(Turnover, type = "multiplicative")
+  ) %>%
+  components() %>%
+  autoplot() +
+  labs(title = "Classical additive decomposition of total
+                  US retail employment")
+
+
+lambda <- RANDOMSERIES %>%
+  features(Turnover, features = guerrero) %>%
+  pull(lambda_guerrero)
+
+RANDOMSERIES %>%
+  autoplot(box_cox(Turnover, lambda))
+RANDOMSERIESTransformed <- box_cox(RANDOMSERIES$Turnover, lambda)
+
+RANDOMSERIES %>%
+  mutate(Transformed = box_cox(Turnover,lambda)) ->RANDOMSERIES
+
+RANDOMSERIES %>% autoplot(Transformed)
+
+RANDOMSERIES %>%
+  mutate(LogSeries = log(Turnover)) ->RANDOMSERIES
+
+
+RANDOMSERIES %>%
+  model(
+    classical_decomposition(Transformed, type = "additive")
+  ) %>%
+  components() %>%
+  autoplot() +
+  labs(title = "Classical additive decomposition of total
+                  US retail employment")
+
+RANDOMSERIES %>%
+  model(
+    STL(Transformed ~ trend(window = 7) +
+          season(window = "periodic"),
+        robust = TRUE)) %>%
+  components() %>%
+  autoplot()
+
+RANDOMSERIES %>% gg_subseries(Transformed)
+
+
+
+
+fit <- RANDOMSERIES %>%
+  model(
+    arima012011 = ARIMA(Transformed ~ pdq(0,1,2) + PDQ(0,1,1)),
+    arima210011 = ARIMA(Transformed ~ pdq(2,1,0) + PDQ(0,1,1)),
+    auto = ARIMA(Transformed, stepwise = FALSE, approx = FALSE)
+)
+
+
+
+fit %>%
+  glance() %>%
+  arrange(AIC)
+
+
+fit %>%
+  select(auto) %>%
+  forecast(h = 12) %>% 
+  autoplot() + autolayer(RANDOMSERIES,.vars = Transformed)

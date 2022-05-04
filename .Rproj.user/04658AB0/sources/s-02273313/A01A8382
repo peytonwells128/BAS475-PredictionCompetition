@@ -1,0 +1,28 @@
+{
+    "id": "A01A8382",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1651677249865.0,
+    "source_on_save": false,
+    "relative_order": 5,
+    "properties": {
+        "id": "eab4b06d51b3453fb6d22b63485977c5",
+        "name": "final_predicts[[3]][[1]]",
+        "title": "final_predicts[[3]][[1]]",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1651676589,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1651677249865,
+    "read_only": false,
+    "read_only_alternatives": []
+}

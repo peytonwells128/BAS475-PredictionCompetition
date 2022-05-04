@@ -60,6 +60,10 @@ fit3_raw %>% forecast(h = 12) -> credit_fcs_raw
 credit_fcs_raw %>% autoplot(tail(credit,48)) + labs(y = "Credit In Millions")
 
 autoplot()
+
+credit %>% model(stepwise = ARIMA(ï..credit_in_millions)) -> final_model
+
+final_model %>% forecast(h = 12) -> final_predicts
 ## EVERYTHING BELOW THIS LINE IS SCRATCH WORK 
 
 

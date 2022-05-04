@@ -44,8 +44,23 @@ fit3 %>% forecast(h = 12) %>% accuracy(credit)
 
 stopCluster(cluster) #Line 3 for parallelization
 
+fit3 %>% forecast(h = 12) -> credit_fcs
 
+credit_fcs %>% autoplot(credit)
 
+train %>%
+  model(NNET = NNETAR(ï..credit_in_millions),
+        arima210 = ARIMA(ï..credit_in_millions ~ pdq(2,1,0)),
+        arima013 = ARIMA(ï..credit_in_millions ~ pdq(0,1,3)),
+        stepwise = ARIMA(ï..credit_in_millions),
+        search = ARIMA(ï..credit_in_millions, stepwise=FALSE),
+        ExponentialSmoothing = ETS(ï..credit_in_millions ~ error("A") + trend("N") + season("N"))) -> fit3_raw
+fit3_raw %>% forecast(h = 12) -> credit_fcs_raw
+
+credit_fcs_raw %>% autoplot(tail(credit,48)) + labs(y = "Credit In Millions")
+
+autoplot()
+## EVERYTHING BELOW THIS LINE IS SCRATCH WORK 
 
 
 
@@ -95,9 +110,6 @@ rmse <- function(y_actual, y_pred) {
 mape <- function(y_actual, y_pred) {
   mean(abs(y_actual - y_pred) / y_actual)
 }
-
-
-## EVERYTHING BELOW THIS LINE IS SCRATCH WORK 
 
 
 
